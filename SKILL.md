@@ -70,7 +70,7 @@ license: MIT
 1. **执行第一层**：阅读 [layer-1-analysis.md](layer-1-analysis.md)，完成前置理解，产出结构化分析文档
 2. **将第一层结果交给用户确认**（如有需要修改的地方，先修改再继续）
 3. **执行第二层**：阅读 [layer-2-script.md](layer-2-script.md)，基于第一层输出生成完整脚本
-4. **执行第三层**：阅读 [layer-3-selfcheck.md](layer-3-selfcheck.md)，对生成的脚本逐项自检，不通过则修改后再输出
+4. **执行第三层**：阅读 [layer-3-selfcheck.md](layer-3-selfcheck.md)，先运行 `python tools/validate_script_format.py` 做格式校验，通过后再逐项自检，不通过则修改后再输出
 
 ---
 
