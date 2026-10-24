@@ -10,6 +10,7 @@
 | 科技 | [tech.md](tech.md) | 产品、技术、测试或使用判断推动内容 |
 | 金融 | [finance.md](finance.md) | 钱、商业或经济决策推动内容 |
 | 时政人文 | [current-affairs.md](current-affairs.md) | 事件、历史、社会或人物议题推动内容 |
+| 纪录片 | [documentary.md](documentary.md) | 对主题、群体、工艺或处境的持续观察推动内容 |
 | 电竞游戏 | [esports-gaming.md](esports-gaming.md) | 电子游戏对局、实况或攻略推动内容 |
 | 综艺游戏 | [variety-game.md](variety-game.md) | 多人规则、回合或社交博弈推动内容 |
 
