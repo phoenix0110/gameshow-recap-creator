@@ -5,9 +5,14 @@ Usage: python tools/validate_script_format.py <script.md>
 Exit 0 = pass, Exit 1 = errors found.
 """
 
+import io
 import re
 import sys
 from pathlib import Path
+
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 HEADER_RE = re.compile(r"^### (\d+:\d{2})\u2013(\d+:\d{2})\uff5c(.+)$")
 CAMERA_RE = re.compile(r"\[\d+:\d{2}\u2013\d+:\d{2}\]")
@@ -51,6 +56,7 @@ def validate(lines: list[str]) -> list[str]:
     end = script_end if script_end > script_start else len(lines)
     prev_end_sec = -1
     seg_count = 0
+    segments: list[tuple[int, int, int, str]] = []
     in_narration = False
 
     for i in range(script_start + 1, end):
@@ -75,6 +81,7 @@ def validate(lines: list[str]) -> list[str]:
             if t0 < prev_end_sec:
                 errors.append(f"ERR L{ln}: overlaps previous segment")
             prev_end_sec = t1
+            segments.append((ln, t0, t1, m[3].strip()))
             continue
 
         if s.startswith("**\u753b\u9762**") and not CAMERA_RE.search(s):
@@ -89,6 +96,16 @@ def validate(lines: list[str]) -> list[str]:
                 errors.append(f"ERR L{ln}: narration line missing '>' prefix")
     if seg_count == 0:
         errors.append("ERR: no ### segments found in script section")
+    elif segments:
+        first_ln, first_start, first_end, first_title = segments[0]
+        if first_start != 0:
+            errors.append(f"ERR L{first_ln}: first segment must start at 0:00")
+        if "\u94a9\u5b50" not in first_title:
+            errors.append(f"ERR L{first_ln}: first segment title must contain '\u94a9\u5b50'")
+        if len(segments) > 1 and segments[1][1] != first_end:
+            errors.append(
+                f"ERR L{segments[1][0]}: first story segment must start when hook ends"
+            )
     return errors
 
 

@@ -1,15 +1,5 @@
-# Game Show 二创解说脚本生成器
+# gameshow-recap-creator
 
-把海外 Game Show / Reality Show 压缩成中文二创解说脚本。
+将一条可独立成篇的 YouTube 博主长视频改写为中文二创解说脚本。
 
-## 文件
-
-- `SKILL.md` — Skill 入口，定义激活条件、风格规范、禁止事项
-- `layer-1-analysis.md` — 第一层：前置理解（角色表、游戏目标、主线、爆点）
-- `layer-2-script.md` — 第二层：脚本生成（结构骨架、输出格式）
-- `layer-3-selfcheck.md` — 第三层：自检清单
-- `tools/validate_script_format.py` — 格式校验脚本，检查段头、旁白等格式是否符合下游要求
-
-## License
-
-MIT
+完整入口见 [SKILL.md](SKILL.md)；通用约束统一见 [Video Recap SOP 的共用制作规则](../video-recap-sop/SKILL.md#共用制作规则)。本目录保留脚本生成、分层复核、字段格式及题材指南。

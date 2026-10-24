@@ -3,7 +3,8 @@
 
 For each script section, extracts subtitle entries within the 画面 time range
 and outputs them alongside the narration text for LLM review.
-Also checks monotonic ordering of source timestamps.
+Also checks monotonic ordering of source timestamps after the opening hook.
+The first section may preview a later highlight; chronology restarts at section 2.
 
 Usage:
     python tools/check_alignment.py <script.md> <subtitle.srt>
@@ -135,9 +136,16 @@ def search_keyword(entries: list[dict], keyword: str) -> list[dict]:
 def run_check(sections: list[dict], srt_entries: list[dict]) -> list[str]:
     errors: list[str] = []
     prev_src_start = -1.0
+    has_opening_hook = bool(sections) and "\u94a9\u5b50" in sections[0]["title"]
 
     for idx, sec in enumerate(sections):
         prefix = f"[{idx + 1}] {sec['title']}"
+        is_opening_hook = has_opening_hook and idx == 0
+
+        if has_opening_hook and idx == 1:
+            # The hook may come from any later source point. Section 2 begins the
+            # main narrative, so source chronology is measured from here.
+            prev_src_start = -1.0
 
         if not sec["visual_ranges"]:
             errors.append(f"{prefix}: no \u753b\u9762 time range found")
@@ -148,12 +156,13 @@ def run_check(sections: list[dict], srt_entries: list[dict]) -> list[str]:
 
             if vs >= ve:
                 errors.append(f"{tag}: inverted range [{_sec_to_mmss(vs)}\u2013{_sec_to_mmss(ve)}]")
-            if vs < prev_src_start:
+            if not is_opening_hook and vs < prev_src_start:
                 errors.append(
                     f"{tag}: NON-MONOTONIC \u2013 [{_sec_to_mmss(vs)}] < "
                     f"previous [{_sec_to_mmss(prev_src_start)}]"
                 )
-            prev_src_start = vs
+            if not is_opening_hook:
+                prev_src_start = vs
 
             subs = subs_in_range(srt_entries, vs, ve)
             if not subs:
@@ -169,6 +178,8 @@ def print_report(sections: list[dict], srt_entries: list[dict]) -> None:
         print(f"\n{'=' * 60}")
         print(f"[{idx + 1}/{len(sections)}] {sec['title']}")
         print(f"  Output: {_sec_to_mmss(sec['out_start'])}\u2013{_sec_to_mmss(sec['out_end'])}")
+        if idx == 0 and "\u94a9\u5b50" in sec["title"]:
+            print("  Timeline: opening preview (source chronology restarts at section 2)")
 
         if not sec["visual_ranges"]:
             print("  \u753b\u9762: (none)")
